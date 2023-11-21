@@ -1,24 +1,8 @@
-import pygame, random
+import pygame
+from ball import Ball
 
-def ball_animation():
-    global ball_speed_x, ball_speed_y, spiller_score, motstander_score
 
-    ball.x += ball_speed_x
-    ball.y += ball_speed_y
 
-    if ball.top <= 0 or ball.bottom >= HOYDE:
-        ball_speed_y *= -1
-
-    if ball.left <= 0:
-        spiller_score += 1
-        ball_restart()
-
-    if ball.right >= BREDDE:
-        motstander_score += 1
-        ball_restart()
-
-    if ball.colliderect(spiller) or ball.colliderect(motstander):
-        ball_speed_x *= -1
 
 def spiller_animation():
     spiller.y += spiller_speed
@@ -28,20 +12,16 @@ def spiller_animation():
         spiller.bottom = HOYDE
 
 def motstander_animation():
-    if motstander.top < ball.y:
+    if motstander.top < ball.ramme.y:
         motstander.top += motstander_speed
-    if motstander.bottom > ball.y:
+    if motstander.bottom > ball.ramme.y:
         motstander.bottom -= motstander_speed
     if motstander.top <= 0:
         motstander.top = 0
     if motstander.bottom >= HOYDE:
         motstander.bottom = HOYDE
 
-def ball_restart():
-    global ball_speed_x, ball_speed_y
-    ball.center = (BREDDE/2, HOYDE/2)
-    ball_speed_y *= random.choice((1, -1))
-    ball_speed_x *= random.choice((1, -1))
+
 
 pygame.init()
 
@@ -49,13 +29,15 @@ BREDDE = 1280
 HOYDE = 750
 FPS = 60
 
+ball = Ball(BREDDE/2 -15, HOYDE/2 -15, 30, 30)
+
 
 vindu = pygame.display.set_mode((BREDDE, HOYDE))
 klokke = pygame.time.Clock()
 
-ball = pygame.Rect(BREDDE/2 - 15, HOYDE/2 - 15, 30, 30)
-ball_speed_x = 15 * random.choice((1, -1))
-ball_speed_y = 15 * random.choice((1, -1))
+
+
+
 
 spiller = pygame.Rect (BREDDE - 20, HOYDE/2 -70, 10, 140)
 spiller_speed = 0
@@ -86,14 +68,26 @@ while True:
             if event.key == pygame.K_UP:
                 spiller_speed += 7
     
-    ball_animation()
+    ball.animation()
     spiller_animation()
     motstander_animation()
+
+    if ball.ramme.x <= 0:
+        spiller_score += 1
+        ball.restart()
+
+    if ball.ramme.x >= BREDDE:
+        motstander_score += 1
+        ball.restart()
+
+    if ball.ramme.colliderect(spiller) or ball.ramme.colliderect(motstander):
+        ball.speed_x *= -1
         
     vindu.fill(bakgrunnsfarge)       
     pygame.draw.rect(vindu, light_grey, spiller)
     pygame.draw.rect(vindu, light_grey, motstander)
-    pygame.draw.ellipse(vindu, light_grey, ball)
+    
+    pygame.draw.ellipse(vindu, light_grey, ball.ramme)
     pygame.draw.aaline(vindu, light_grey, (BREDDE/2,0), (BREDDE/2, HOYDE))
         
     spiller_text = game_font.render(f"{spiller_score}", False, light_grey)
@@ -103,6 +97,5 @@ while True:
     vindu.blit(motstander_text, (600, 400))
 
     
-
     pygame.display.flip()
     klokke.tick(FPS)
