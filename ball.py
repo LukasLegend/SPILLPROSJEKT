@@ -4,8 +4,7 @@ import random
 class Ball(Figur):
     def __init__(self, x: int, y: int, bredde: int, hoyde: int):
         super().__init__(x, y, bredde, hoyde)
-
-        self.ramme.centerx = bredde/2
+        self.ramme.centerx = bredde
         self.ramme.centery = hoyde
         self.speed_x = 15 * random.choice((1, -1))
         self.speed_y = 15 * random.choice((1, -1))
